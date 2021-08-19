@@ -67,7 +67,6 @@ web3 = new Web3(App.web3Provider);
 
   bindEvents: function() {
     $(document).on('click', '.btn-adopt', App.handleAdopt);
-    $(document).on('click', '.btn-donate', App.handleDonate);
   },
 
   markAdopted: function(adopters, account) {
@@ -115,26 +114,25 @@ web3 = new Web3(App.web3Provider);
     });
   },
 
-  handleDonate: function(event) {
-    event.preventDefault();
+  handleDonate: function() {
       var x;
       var amount=prompt("Please enter the amount you want to donate in ether", 0.0001);
       if (amount!=null) {
         x="You will donate "+ amount+ "ether to petShop owner. Comfirmed?";
         if(confirm(x)) {
           var account;
-          web3.eth.getAccounts().then(function(result) {
-            account = result[0];
-          })
-          alert(account);
-          web3.eth.sendTransaction({
-            from: account,
-            to: App.contracts.Adoption.address,
-            value: web3.utils.toWei(amount, 'ether'),
-          }).then(function(result) {
-            alert("donate finished!");
-          }).catch(function(err) {
-            alert("donate unfinished!");
+          web3.eth.getAccounts(function(error, accounts) {
+            if (error) {
+              console.log(error);
+            }
+            var account = accounts[0];
+            web3.eth.sendTransaction({from: account, to: App.contracts.Adoption.address, value:web3.toWei(amount, "ether"), gasPrice: web3.toWei(5,'gwei')}, function(err, transactionHash){
+              if (!err) //if TX submitted, the following function increments the donation counter artificially to give the user instant feedback – despite the fact that the TX may still fail. 
+                //Please consider carefully whether or not to implement this feature. 
+                alert("Thanks for your donation. TX hash: " + transactionHash.substring(0,8) + "...");
+              else
+                alert("donation failed. ");
+            });
           });
         }
         else
