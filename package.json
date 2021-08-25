@@ -14,5 +14,14 @@
   "license": "ISC",
   "devDependencies": {
     "lite-server": "^2.3.0"
+  },
+  "dependencies": {
+    "bootstrap": "^3.4.1",
+    "bootstrap-table": "^1.18.3",
+    "buffer": "^6.0.3",
+    "cors": "^2.8.5",
+    "express-fileupload": "^1.2.1",
+    "ipfs-api": "^26.1.2",
+    "web3": "^0.20.7"
   }
 }
