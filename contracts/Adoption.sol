@@ -51,7 +51,7 @@ contract Adoption {
         address currentAdopter = Pets[_testIterationNum][petId].adopter;
 
 
-        if (bidPrice > minimumPrice) { //(bidPrice > minimumPrice && msg.sender != currentAdopter)
+        if (bidPrice >= minimumPrice) { //(bidPrice >= minimumPrice && msg.sender != currentAdopter)
             Pets[_testIterationNum][petId].currentPrice = bidPrice;
             Pets[_testIterationNum][petId].adopter = msg.sender;
             emit Bidding(petId, bidPrice, msg.sender);
