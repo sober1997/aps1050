@@ -3,7 +3,7 @@ pragma experimental ABIEncoderV2;
 contract Adoption {
     uint VersionMarker3 = 650;
     event GetPetCount(uint256 _count);
-    event Bidding(uint256 _petId, uint256 _biddingPrice, address bidderAddres);
+    event Bidding(uint256 _petId, uint256 _biddingPrice, address _bidderAddres, bool _isSuccess);
 
     struct Pet {
         uint256 id;
@@ -54,10 +54,11 @@ contract Adoption {
         if (bidPrice >= minimumPrice) { //(bidPrice >= minimumPrice && msg.sender != currentAdopter)
             Pets[_testIterationNum][petId].currentPrice = bidPrice;
             Pets[_testIterationNum][petId].adopter = msg.sender;
-            emit Bidding(petId, bidPrice, msg.sender);
+            emit Bidding(petId, bidPrice, msg.sender, true);
             return true;
         }
         else {
+            emit Bidding(petId, bidPrice, msg.sender, false);
             return false;
         }
     }
