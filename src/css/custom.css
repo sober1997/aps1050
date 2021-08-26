@@ -4,8 +4,8 @@
     margin: 0 auto;
 }
 .form-table {
-    width: 80%;
-    padding: 15px;
+    width: 120%;
+    padding: 20px;
     margin: 0 auto;
 }
 .form-login .form-control {
@@ -16,4 +16,94 @@
     box-sizing: border-box;
     padding: 10px;
     font-size: 16px;
+}
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    /* background: #494A5F; */
+    font-weight: 500;
+    font-family: "Microsoft YaHei","宋体","Segoe UI", "Lucida Grande", Helvetica, Arial,sans-serif, FreeSans, Arimo;
+}
+
+#container {
+    width: 500px;
+    height: 820px;
+    margin: 0 auto;
+}
+div.search {padding: 30px 0;}
+
+form {
+    position: relative;
+    width: 300px;
+    margin: 0 auto;
+}
+
+input, button {
+    border: none;
+    outline: none;
+}
+
+select {
+    position: relative;
+    width: 300px;
+    margin: 0 auto;
+}
+
+input {
+    width: 100%;
+    height: 42px;
+    padding-left: 13px;
+    padding-right:46px;
+}
+/*搜索框7*/
+/* .bar7 {background: #7BA7AB;} */
+.bar7 form {
+    height: 42px;
+    float:right;
+    border-radius: 42px;
+}
+.bar7 select {
+    width: 120px;
+    height: 42px;
+    border-radius: 42px 0 0 42px;
+    border: 2px solid #324B4E;
+    background: #7BA7AB;
+    cursor: pointer;
+    position: absolute;
+    top: 50px;
+    left: 10px;
+    padding: 0 0 0 20px;
+}
+.bar7 input {
+    width: 200px;
+    border-radius: 0 42px 42px 0;
+    border: 2px solid #324B4E;
+    background: #F9F0DA;
+    transition: .3s linear;
+    /* cursor: pointer; */
+    position: absolute;
+    top: 50px;
+    right: 0;
+    /* float: right; */
+}
+/* .bar7 input:focus {
+    width: 300px;
+} */
+.bar7 button {
+    height: 42px;
+    width: 42px;
+    cursor: pointer;
+    position: absolute;
+    background: none;
+    top: 50px;
+    right: 0;
+}
+.bar7 button:before{
+    content: "\f002";
+    font-family: FontAwesome;
+    color: #324b4e;
 }

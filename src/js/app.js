@@ -42,7 +42,7 @@ App = {
       App.contracts.Adoption.setProvider(App.web3Provider);
 
       // Use our contract to retrieve and mark the adopted pets
-      return App.LoadPetInfo();
+      return App.LoadInfo();
     });
 
     return App.bindEvents();
@@ -50,47 +50,47 @@ App = {
 
   bindEvents: function () {
     $(document).on('click', '.btn-adopt', App.handleAdopt);
-    $(document).on('submit', '.form-add', App.handleAddPet);
+    $(document).on('submit', '.form-login', App.handleAddPet);
+    $(document).on('submit', '.form-inline', App.LoadPetInfo);
   },
-
- LoadPetInfo: async function() {
-  var petsRow = $('#petsRow');
-  var petTemplate = $('#petTemplate');
-  var instance = await App.contracts.Adoption.deployed();
-  var num = await instance.petsCount.call();
-  var array = [];
-  for (i = 0; i < num; i++) {
-    array.push(instance.getPetInfo(i));
-  }
-  vals = await Promise.all(array);
-  // alert(vals);
-  for(i = 0;i <vals.length;i++) {
-    petTemplate.find('.btn-adopt').attr('data-id', vals[i][0]);
-    petTemplate.find('.panel-title').text(vals[i][1]);
-    petTemplate.find('img').attr('src', vals[i][2]);
-    petTemplate.find('.pet-age').text(vals[i][3]);
-    petTemplate.find('.pet-breed').text(vals[i][4]);
-    petTemplate.find('.pet-location').text(vals[i][5]);
-
-    petsRow.append(petTemplate.html());
-
+  LoadInfo: async function () {
+    var petsRow = $('#petsRow');
+    var petTemplate = $('#petTemplate');
+    var instance = await App.contracts.Adoption.deployed();
+    var num = await instance.petsCount.call();
+    var array = [];
+    for (i = 0; i < num; i++) {
+      array.push(instance.getPetInfo(i));
     }
-  return App.markAdopted();
- },
+    vals = await Promise.all(array);
+    var attribute = document.getElementById("attribute").value;
+    var attributeValue = document.getElementById("attributeValue").value;
+    // alert(attribute);
+    // alert(attributeValue);
+    // alert(vals);
+    petsRow.empty();
+    for (i = 0; i < vals.length; i++) {
+      if (attributeValue == "" || attribute == "breed" && vals[i][4] == attributeValue ||
+        attribute == "age" && vals[i][3] == attributeValue ||
+        attribute == "location" && vals[i][5] == attributeValue) {
+        petTemplate.find('.btn-adopt').attr('data-id', vals[i][0]);
+        petTemplate.find('.panel-title').text(vals[i][1]);
+        petTemplate.find('img').attr('src', vals[i][2]);
+        petTemplate.find('.pet-age').text(vals[i][3]);
+        petTemplate.find('.pet-breed').text(vals[i][4]);
+        petTemplate.find('.pet-location').text(vals[i][5]);
+        if (vals[i][6] !== '0x0000000000000000000000000000000000000000')
+          petTemplate.find('button').text('Adopted').attr('disabled', true);
+        else
+          petTemplate.find('button').text('Adopt').attr('disabled', false);
 
-markAdopted: async function () {
-  var instance = await App.contracts.Adoption.deployed();
-  var num = await instance.petsCount.call();
-  var array = [];
-  for (i = 0; i < num; i++) {
-    array.push(instance.getPetInfo(i));
-  }
-  vals = await Promise.all(array);
-  for (i = 0; i < num; i++) {
-    if (vals[i][6] !== '0x0000000000000000000000000000000000000000') {
-              $('.panel-pet').eq(i).find('button').text('Success').attr('disabled', true);
-            }
-  }
+        petsRow.append(petTemplate.html());
+      }
+    }
+  },
+  LoadPetInfo: async function (event) {
+    event.preventDefault();
+    return App.LoadInfo();
   },
 
   handleAdopt: function (event) {
@@ -113,7 +113,7 @@ markAdopted: async function () {
         // Execute adopt as a transaction by sending account
         return adoptionInstance.setAdopter(petId, { from: account });
       }).then(function (result) {
-        return App.markAdopted();
+        return App.LoadInfo();
       }).catch(function (err) {
         console.log(err.message);
       });
@@ -172,12 +172,12 @@ markAdopted: async function () {
         alert(json);
         App.contracts.Adoption.deployed().then(function (instance) {
           adoptionInstance = instance;
-        // alert(object["name"]);
+          // alert(object["name"]);
           // Execute adopt as a transaction by sending account
           return adoptionInstance.addNewPet(object["name"], object["picture"], parseInt(object["age"]), object["breed"], object["location"]);
         }).then(function (res) {
           alert("Add New Pet Successfully! Now pets count is " + res.logs[0].args._count.toNumber());
-        }).then(function(res) {
+        }).then(function (res) {
           window.location.replace("index.html");
         });
 
@@ -186,8 +186,12 @@ markAdopted: async function () {
     const photo = document.getElementById("id_picture");
     reader.readAsArrayBuffer(photo.files[0]); // Read Provided File
 
+  },
+
+  searchPets: function () {
 
   }
+
 };
 
 $(function () {

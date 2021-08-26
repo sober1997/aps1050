@@ -1,54 +1,12 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>JavaScript file upload</title>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <!-- <script src="https://wzrd.in/standalone/buffer"></script> -->
-    <script src="https://bundle.run/buffer@5.2.1"></script>
-    <script src="https://unpkg.com/ipfs-api@9.0.0/dist/index.js"
-    integrity="sha384-5bXRcW9kyxxnSMbOoHzraqa7Z0PQWIao+cgeg327zit1hz5LZCEbIMx/LWKPReuB"
-    crossorigin="anonymous"></script>
-    <!-- <script src="js/app1.js"></script> -->
-  </head>
-  <script type="text/javascript">
-    function upload() {
-      const reader = new FileReader();
-      reader.onloadend = function() {
-        const ipfs = window.IpfsApi('localhost', 5001) // Connect to IPFS
-        const buf = buffer.Buffer(reader.result) // Convert data into buffer
-        ipfs.files.add(buf, (err, result) => { // Upload buffer to IPFS
-          if(err) {
-            console.error(err)
-            return
-          }
-          let url = `https://ipfs.io/ipfs/${result[0].hash}`
-          console.log(`Url --> ${url}`)
-          document.getElementById("url").innerHTML= url
-          document.getElementById("url").href= url
-          document.getElementById("output").src = url
-        })
-      }
-      const photo = document.getElementById("photo");
-      reader.readAsArrayBuffer(photo.files[0]); // Read Provided File
-    }
-  </script>
-  <body>
-    <form action="/">
-      <fieldset>
-        <legend>Upload photo</legend>
-        <input type="file" name="photo" id="photo">
-        <button type="button" onclick="upload()">Upload</button>
-      </fieldset>
-    </form>
-    </br>
-    </br>
-    <a id="url"></a>
-    </br>
-    </br>
-    <img id="output">
-  </body>
-</html>
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
 
-
-<!-- ipfs config --json API.HTTPHeaders.Access-Control-Allow-Origin  '[\"*\"]'
-ipfs config --json API.HTTPHeaders.Access-Control-Allow-Method '[\"PUT\", \"GET\", \"POST\", \"OPTIONS\"]' -->
+<!-- <div class="form-group"> -->
+    <div class="input-group">
+      <div class="input-group-addon select-input">
+        <select>
+            <option value="test">Test</option>
+        </select>
+      </div>
+        <input class="form-control" type="text">
+    </div>
+<!-- </div> -->

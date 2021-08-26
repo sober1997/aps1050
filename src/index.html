@@ -14,9 +14,17 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="js/bootstrap.min.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <script src="js/bootstrap-table.js"></script>
+    <link href="css/bootstrap-table.css" rel="stylesheet">
+    <script src="js/fileinput.min.js"></script>
+    <link href="css/fileinput.min.css" rel="stylesheet">
+    <link href="http://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link href="css/custom.css" rel="stylesheet">
     <script src="js/web3.min.js"></script>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script> -->
-    <!-- <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@0.20.6/dist/web3.min.js"></script></script> -->    <script src="js/truffle-contract.js"></script>
+    <script src="js/truffle-contract.js"></script>
     <script src="js/app.js"></script>
     
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -30,13 +38,6 @@
     <div class="navbar navbar-inverse" role="navigation">
       <div class="container">
           <div class="navbar-header">
-              <!-- <button type="button" class="navbar-toggle"
-                      data-toggle="collapse" data-target=".navbar-collapse">
-                  <span class="sr-only">Toggle navigation</span>
-                  <span class="icon-bar"></span>
-                  <span class="icon-bar"></span>
-                  <span class="icon-bar"></span>
-              </button> -->
               <a class="navbar-brand" href="/">Pet Shop</a>
           </div>
           <div class="navbar-collapse collapse">
@@ -53,11 +54,23 @@
       <div class="row">
         <div class="col-xs-12 col-sm-8 col-sm-push-2">
           <h1 class="text-center">Pete's Pet Shop</h1>
-          <hr/>
-          <br/>
         </div>
       </div>
-
+      <div class="search bar7">
+        <form class="form-inline">
+          <!-- <label class="control-label">Select File</label> -->
+          <select id = "attribute" >
+            <option value="breed" selected="selected">Breed</option>
+            <option value="age">Age</option>
+            <option value="location">Location</option>
+          </select>
+          <input type="text" id="attributeValue">
+          <button type="submit">
+        </form>
+      </div>
+      <hr/>
+      <br/>
+      <br/>
       <div id="petsRow" class="row">
         <!-- PETS LOAD HERE -->
       </div>
