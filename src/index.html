@@ -26,6 +26,7 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
   </head>
+
   <body>
     <div class="navbar navbar-inverse" role="navigation">
       <div class="container">
@@ -52,18 +53,31 @@
     <div class="container">
       <div class="row">
         <div class="col-xs-12 col-sm-8 col-sm-push-2">
-          <h1 class="text-center">Pete's Pet Shop</h1>
+          <h1 class="text-center">Adoption</h1>
+          <hr/>
+          <br/>
+        </div>
+      </div>
+      
+      <div id="petsRowForAdoption" class="row">
+        <!-- ADOPTION PETS LOAD HERE -->
+      </div>
+      
+      <div class="row">
+        <div class="col-xs-12 col-sm-8 col-sm-push-2">
+          <h1 class="text-center">Auction</h1>
           <hr/>
           <br/>
         </div>
       </div>
 
-      <div id="petsRow" class="row">
-        <!-- PETS LOAD HERE -->
+      <div id="petsRowForAuction" class="row">
+        <!-- AUCTION PETS LOAD HERE -->
       </div>
     </div>
-
-    <div id="petTemplate" style="display: none;">
+    
+    <!-- Templates -->
+    <div id="petTemplateForAdoption" style="display: none;">
       <div class="col-sm-6 col-md-4 col-lg-3">
         <div class="panel panel-default panel-pet">
           <div class="panel-heading">
@@ -80,5 +94,37 @@
         </div>
       </div>
     </div>
+
+    <div id="petTemplateForAuction" style="display: none;">
+      <div class="col-sm-6 col-md-4 col-lg-3">
+        <div class="panel panel-default panel-pet">
+          <div class="panel-heading">
+            <h3 class="panel-title">Scrappy</h3>
+          </div>
+          <div class="panel-body">
+            <img alt="140x140" data-src="holder.js/140x140" class="img-rounded img-center" style="width: 100%;" src="images/golden-retriever.jpeg" data-holder-rendered="true">
+            <br/><br/>
+            <strong>Breed</strong>: <span class="pet-breed">Golden Retriever</span><br/>
+            <strong>Age</strong>: <span class="pet-age">3</span><br/>
+            <strong>Location</strong>: <span class="pet-location">Warren, MI</span><br/><br/>
+            <strong>Current Price</strong>: <span class="pet-current-price">20.0</span><br/>
+            <strong>Minimum Increment</strong>: <span class="pet-min-increment">12:30</span><br/>
+            <strong>Highest Bidder</strong>: <span class="pet-adopter">winner</span><br/><br/>
+            <!-- The following button is based on https://github.com/AkshataPuranik123/APS1050/blob/master/src/index.html -->
+            <form>
+              <div class="form-row align-items-center">
+                <div class="col-auto">
+                  <input type="number" class="form-control input-amount" placeholder="Bid Price" min="0.00" name="bid" id = '0'>
+                </div>
+                <div class="col-auto">
+                  <button class="btn btn-default btn-bid" data-id='0'>Submit Bid</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </body>
 </html>
