@@ -201,11 +201,17 @@ handleBid: function (event) {
 
       return biddingInstance.processBid(petId, bid_price, {from: account});
     }).then(function (result) {
-      alert(result);
+      if (result.logs[0].args._isSuccess) {
+        alert("Congrats, your bid has been successfully placed!");
+      }
+      else {
+        alert("Sorry, your bid is unsuccessful!"); //might be able to add the reason...
+      }
+      window.location.reload();
       return App.markAdopted();
     }).catch(function (err) {
       console.log(err.message);
-    });
+    })
   });
 },
 
