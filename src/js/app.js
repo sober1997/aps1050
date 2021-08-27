@@ -53,7 +53,7 @@ App = {
     $(document).on('submit', '.form-inline', App.LoadPetInfo);
     $(document).on('click', '.btn-like', App.handleLike);
     $(document).on('click', '.btn-bid', App.handleBid);
-    $(document).on('submit', '.form-add', App.handleAddPet);
+    $(document).on('submit', '.form-login', App.handleAddPet);
   },
 
  LoadInfo: async function() {
@@ -94,46 +94,46 @@ App = {
 
   petBasicInfo = await Promise.all(petBasicInfo);
   petLike = await Promise.all(petLike);
+
+  AdoptionRow.empty();
+  AuctionRow.empty();
+
+  var attribute = document.getElementById("attribute").value;
+  var attributeValue = document.getElementById("attributeValue").value;
+  
+  // console.log(attribute);
+  // console.log(attributeValue);
+
   for(i = 0;i <petBasicInfo.length;i++) {
-    AdoptionTemp.find('.btn-adopt').attr('data-id', petBasicInfo[i][0]);
-    AdoptionTemp.find('.btn-like').attr('data-id', petBasicInfo[i][0]);
-    AdoptionTemp.find('.glyphicon-heart').attr('data-id', petBasicInfo[i][0]);
-    AdoptionTemp.find('.panel-title').text(petBasicInfo[i][1]);
-    AdoptionTemp.find('img').attr('src', petBasicInfo[i][2]);
-    AdoptionTemp.find('.pet-age').text(petBasicInfo[i][3]);
-    AdoptionTemp.find('.pet-breed').text(petBasicInfo[i][4]);
-    AdoptionTemp.find('.pet-location').text(petBasicInfo[i][5]);
+    if (attributeValue == "" || attribute == "breed" && petBasicInfo[i][4] == attributeValue ||
+        attribute == "age" && petBasicInfo[i][3] == attributeValue ||
+        attribute == "location" && petBasicInfo[i][5] == attributeValue){
+      AdoptionTemp.find('.btn-adopt').attr('data-id', petBasicInfo[i][0]);
+      AdoptionTemp.find('.btn-like').attr('data-id', petBasicInfo[i][0]);
+      AdoptionTemp.find('.glyphicon-heart').attr('data-id', petBasicInfo[i][0]);
+      AdoptionTemp.find('.panel-title').text(petBasicInfo[i][1]);
+      AdoptionTemp.find('img').attr('src', petBasicInfo[i][2]);
+      AdoptionTemp.find('.pet-age').text(petBasicInfo[i][3]);
+      AdoptionTemp.find('.pet-breed').text(petBasicInfo[i][4]);
+      AdoptionTemp.find('.pet-location').text(petBasicInfo[i][5]);
 
-    //update the buffer
-    if (petBasicInfo[i][6] !== '0x0000000000000000000000000000000000000000')
-      petTemplate.find('#0').text('Adopted').attr('disabled', true);
-    else
-      petTemplate.find('#0').text('Adopt').attr('disabled', false);
+      //update the buffer
+      if (petBasicInfo[i][6] !== '0x0000000000000000000000000000000000000000')
+        AdoptionTemp.find('#0').text('Adopted').attr('disabled', true);
+      else
+        AdoptionTemp.find('#0').text('Adopt').attr('disabled', false);
 
-    if (petLike[i]) {
-      petTemplate.find('#like').css('color', "#E3170D");
-      petTemplate.find('#1').attr('disabled', true);
-    }
-    else{
-      petTemplate.find('#like').css('color', "grey");
-      petTemplate.find('#1').attr('disabled', false);
+      if (petLike[i]) {
+        AdoptionTemp.find('#like').css('color', "#E3170D");
+        AdoptionTemp.find('#1').attr('disabled', true);
+      }
+      else{
+        AdoptionTemp.find('#like').css('color', "grey");
+        AdoptionTemp.find('#1').attr('disabled', false);
     }
     AdoptionRow.append(AdoptionTemp.html());
   }
-  // mark adopted pets
-    if (vals[i][6] !== '0x0000000000000000000000000000000000000000')
-                    petTemplate.find('#0').text('Adopted').attr('disabled', true);
-                else
-                    petTemplate.find('#0').text('Adopt').attr('disabled', false);
-
-                if (vals_like[i]) {
-                    petTemplate.find('#like').css('color', "#E3170D");
-                    petTemplate.find('#1').attr('disabled', true);
-                }
-                else{
-                    petTemplate.find('#like').css('color', "grey");
-                    petTemplate.find('#1').attr('disabled', false);
-                }
+  }
 
 
   // 3.obtain the pet details and update the html (auction)
@@ -148,6 +148,9 @@ App = {
   petPriceInfo = await Promise.all(petPriceInfo);
 
   for(i = 0;i <petBasicInfo.length;i++) {
+    if (attributeValue == "" || attribute == "breed" && petBasicInfo[i][4] == attributeValue ||
+        attribute == "age" && petBasicInfo[i][3] == attributeValue ||
+        attribute == "location" && petBasicInfo[i][5] == attributeValue){
     AuctionTemp.find('.btn-bid').attr('data-id', petBasicInfo[i][0]);
     AuctionTemp.find('.input-amount').attr('id', petBasicInfo[i][0]);
     AuctionTemp.find('.panel-title').text(petBasicInfo[i][1]);
@@ -162,6 +165,7 @@ App = {
 
     AuctionRow.append(AuctionTemp.html());
   }
+}
   return App.markAdopted();
  },
 
@@ -207,7 +211,7 @@ handleAdopt: function (event) {
       // Execute adopt as a transaction by sending account
       return adoptionInstance.setAdopter(petId, { from: account });
     }).then(function (result) {
-      return App.markAdopted();
+      return App.LoadInfo();
     }).catch(function (err) {
         console.log(err.message);
       });
