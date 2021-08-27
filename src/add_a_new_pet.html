@@ -93,6 +93,20 @@
             <input type="text" class="form-control" name="location" id="id_location" placeholder="Enter its location" required>
         </div>
         <div class="form-group">
+            <input type="radio" class="form-control" id="id_adoption" name="choice_of_type" value="adoption">
+            <label for="adoption">Adoption</label><br>
+            <input type="radio" class="form-control" id="id_auction" name="choice_of_type" value="auction">
+            <label for="auction">Auction</label>
+        </div>
+        <div class="form-group">
+            <label for="id_minBid">Minimum Bid</label>
+            <input type="text" class="form-control" name="minBid" id="id_minBid" placeholder="5" required>
+        </div>
+        <div class="form-group">
+            <label for="id_minIncrement">Minimum Increment</label>
+            <input type="text" class="form-control" name="minIncrement" id="id_minIncrement" placeholder="1" required>
+        </div>
+        <div class="form-group">
             <a class="btn btn-default pull-left" href="/">Back</a>
             <button type="submit" class="btn btn-primary pull-right">Submit</button>
         </div>

@@ -1,7 +1,10 @@
 pragma solidity ^0.5.0;
 pragma experimental ABIEncoderV2;
 contract Adoption {
+    uint VersionMarker3 = 650;
     event GetPetCount(uint256 _count);
+    event Bidding(uint256 _petId, uint256 _biddingPrice, address _bidderAddres, bool _isSuccess);
+
     struct Pet {
         uint256 id;
         string name;
@@ -9,10 +12,16 @@ contract Adoption {
         uint256 age;
         string breed;
         string location;
-        address adopter;
+        address adopter; //also the winner of an auction
+
+        bool forFree; //true is for adotion, false is for auction
+        //parameters below are for aucitons only
+        uint256 currentPrice;
+        uint256 minIncrement;
     }
 
-    mapping(uint256 => mapping(uint256 => Pet)) public Pets;
+    mapping(uint256 => mapping(uint256 => Pet)) public Pets; //[# of generations][pet-id]
+
     uint256 public petsCount;
     uint256 private _testIterationNum = 0;
     mapping(uint256 => address[]) public likes;
@@ -23,21 +32,58 @@ contract Adoption {
 
     // Adopting a pet
     function setAdopter(uint256 petId) public returns (uint256) {
-        require(petId >= 0 && petId < petsCount);
+        require(petId >= 0 && petId < petsCount && Pets[_testIterationNum][petId].forFree == true); 
+        //we might need to add Pets[_testIterationNum][petId].adopter == address(0)
+        //and Pets[_testIterationNum][petId].forFree == true
 
         Pet storage pet = Pets[_testIterationNum][petId];
         pet.adopter = msg.sender;
 
+        // Pets[_testIterationNum][petId].adopter = msg.sender;
+
         return petId;
     }
 
+    // Bid on a pet
+    function processBid(uint256 petId, uint256 bidPrice) public returns (bool) {
+        require(petId >= 0 && petId < petsCount && Pets[_testIterationNum][petId].forFree == false);
+
+        uint256 minimumPrice = Pets[_testIterationNum][petId].currentPrice + Pets[_testIterationNum][petId].minIncrement;
+        address currentAdopter = Pets[_testIterationNum][petId].adopter;
+
+
+        if (bidPrice >= minimumPrice) { //(bidPrice >= minimumPrice && msg.sender != currentAdopter)
+            Pets[_testIterationNum][petId].currentPrice = bidPrice;
+            Pets[_testIterationNum][petId].adopter = msg.sender;
+            emit Bidding(petId, bidPrice, msg.sender, true);
+            return true;
+        }
+        else {
+            emit Bidding(petId, bidPrice, msg.sender, false);
+            return false;
+        }
+    }
+
+    // Adding new pet
     function addNewPet(
         string memory name,
         string memory picHash,
         uint256 age,
         string memory breed,
-        string memory location
+        string memory location,
+
+        bool forFree,
+        uint256 startPrice,
+        uint256 minIncrement 
     ) public returns (uint256) {
+        // to make sure the followings are positive 
+        if (startPrice<0) {
+            startPrice = 1;
+        }
+        if (minIncrement<0) {
+            minIncrement = 1;
+        }
+
         Pets[_testIterationNum][petsCount] = Pet(
             petsCount,
             name,
@@ -45,7 +91,11 @@ contract Adoption {
             age,
             breed,
             location,
-            0x0000000000000000000000000000000000000000
+            address(0),
+
+            forFree,
+            startPrice,
+            minIncrement
         );
         petsCount++;
         emit GetPetCount(petsCount);
@@ -79,11 +129,30 @@ contract Adoption {
     //     return (ids,names,pictureHashs,ages,breeds,locations,adopters);
     // }
 
+    // Solidity Function has maxmum number of local variables of 16, string counts two.
     function getPetInfo(uint256 petId) public view returns (uint256, string memory, string memory, uint256, string memory, string memory, address) {
         require(petId >= 0 && petId < petsCount);
-        return (Pets[_testIterationNum][petId].id, Pets[_testIterationNum][petId].name, Pets[_testIterationNum][petId].pictureHash, Pets[_testIterationNum][petId].age, Pets[_testIterationNum][petId].breed, Pets[_testIterationNum][petId].location, Pets[_testIterationNum][petId].adopter);
+        return (Pets[_testIterationNum][petId].id, 
+                Pets[_testIterationNum][petId].name, 
+                Pets[_testIterationNum][petId].pictureHash, 
+                Pets[_testIterationNum][petId].age, 
+                Pets[_testIterationNum][petId].breed, 
+                Pets[_testIterationNum][petId].location, 
+                Pets[_testIterationNum][petId].adopter);
     }
 
+    function getPetType(uint256 petId) public view returns (uint256, bool) {
+        require(petId >= 0 && petId < petsCount);
+        return (Pets[_testIterationNum][petId].id, Pets[_testIterationNum][petId].forFree);
+    }
+
+    function getPetPrice(uint256 petId) public view returns (uint256, uint256, uint256, address) {
+        require(petId >= 0 && petId < petsCount);
+        return (Pets[_testIterationNum][petId].id, 
+                Pets[_testIterationNum][petId].currentPrice, 
+                Pets[_testIterationNum][petId].minIncrement,
+                Pets[_testIterationNum][petId].adopter);
+    }
     // function getPetInfo(uint256 petId) public view returns (Pet memory) {
     //     require(petId >= 0 && petId < petsCount);
     //     return Pets[_testIterationNum][petId];

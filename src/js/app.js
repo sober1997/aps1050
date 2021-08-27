@@ -1,96 +1,127 @@
 App = {
-    web3Provider: null,
-    contracts: {},
+  web3Provider: null,
+  contracts: {},
 
-    init: async function () {
-        return await App.initWeb3();
-    },
+  init: async function () {
+    return await App.initWeb3();
+  },
 
-    initWeb3: async function () {
+  initWeb3: async function () {
 
-        // Modern dapp browsers...
-        if (window.ethereum) {
-            App.web3Provider = window.ethereum;
-            try {
-                // Request account access
-                await window.ethereum.enable();
-            } catch (error) {
-                // User denied account access...
-                console.error("User denied account access")
-            }
-        }
-        // Legacy dapp browsers...
-        else if (window.web3) {
-            App.web3Provider = window.web3.currentProvider;
-        }
-        // If no injected web3 instance is detected, fall back to Ganache
-        else {
-            App.web3Provider = new Web3.providers.HttpProvider('http://localhost:7545');
-        }
-        web3 = new Web3(App.web3Provider);
-        web3.eth.defaultAccount = web3.eth.accounts[0];
-        return App.initContract();
-    },
+    // Modern dapp browsers...
+    if (window.ethereum) {
+      App.web3Provider = window.ethereum;
+      try {
+        // Request account access
+        await window.ethereum.enable();
+      } catch (error) {
+        // User denied account access...
+        console.error("User denied account access")
+      }
+    }
+    // Legacy dapp browsers...
+    else if (window.web3) {
+      App.web3Provider = window.web3.currentProvider;
+    }
+    // If no injected web3 instance is detected, fall back to Ganache
+    else {
+      App.web3Provider = new Web3.providers.HttpProvider('http://localhost:7545');
+    }
+    web3 = new Web3(App.web3Provider);
+    web3.eth.defaultAccount = web3.eth.accounts[0];
+    return App.initContract();
+  },
 
-    initContract: async function () {
-        $.getJSON('Adoption.json', function (data) {
-            // Get the necessary contract artifact file and instantiate it with truffle-contract
-            var AdoptionArtifact = data;
-            App.contracts.Adoption = TruffleContract(AdoptionArtifact);
+  initContract: async function () {
+    $.getJSON('Adoption.json', function (data) {
+      // Get the necessary contract artifact file and instantiate it with truffle-contract
+      var AdoptionArtifact = data;
+      App.contracts.Adoption = TruffleContract(AdoptionArtifact);
 
-            // Set the provider for our contract
-            App.contracts.Adoption.setProvider(App.web3Provider);
+      // Set the provider for our contract
+      App.contracts.Adoption.setProvider(App.web3Provider);
 
-            // Use our contract to retrieve and mark the adopted pets
-            return App.LoadInfo();
-        });
+      // Use our contract to retrieve and mark the adopted pets
+      return App.LoadInfo();
+    });
 
-        return App.bindEvents();
-    },
+    return App.bindEvents();
+  },
 
-    bindEvents: function () {
-        $(document).on('click', '.btn-adopt', App.handleAdopt);
-        $(document).on('submit', '.form-login', App.handleAddPet);
-        $(document).on('submit', '.form-inline', App.LoadPetInfo);
-        $(document).on('click', '.btn-like', App.handleLike);
-    },
-    LoadInfo: async function () {
-        var petsRow = $('#petsRow');
-        var petTemplate = $('#petTemplate');
-        var instance = await App.contracts.Adoption.deployed();
-        var num = await instance.petsCount.call();
-        var array = [];
-        var like = [];
-        for (i = 0; i < num; i++) {
-            array.push(instance.getPetInfo(i));
-            like.push(instance.getLike(i));
-        }
-        // console.log(like);
+  bindEvents: function () {
+    $(document).on('click', '.btn-adopt', App.handleAdopt);
+    $(document).on('submit', '.form-inline', App.LoadPetInfo);
+    $(document).on('click', '.btn-like', App.handleLike);
+    $(document).on('click', '.btn-bid', App.handleBid);
+    $(document).on('submit', '.form-add', App.handleAddPet);
+  },
 
-        vals = await Promise.all(array);
-        vals_like = await Promise.all(like);
+ LoadInfo: async function() {
+  var AdoptionRow= $('#petsRowForAdoption');
+  var AdoptionTemp = $('#petTemplateForAdoption');
+  var AuctionRow = $('#petsRowForAuction');
+  var AuctionTemp = $('#petTemplateForAuction');
 
-        console.log(vals_like);
-        var attribute = document.getElementById("attribute").value;
-        var attributeValue = document.getElementById("attributeValue").value;
-        // alert(attribute);
-        // alert(attributeValue);
-        // alert(vals);
-        petsRow.empty();
-        for (i = 0; i < vals.length; i++) {
-            if (attributeValue == "" || attribute == "breed" && vals[i][4] == attributeValue ||
-                attribute == "age" && vals[i][3] == attributeValue ||
-                attribute == "location" && vals[i][5] == attributeValue) {
-                petTemplate.find('.btn-adopt').attr('data-id', vals[i][0]);
-                petTemplate.find('.btn-like').attr('data-id', vals[i][0]);
-                petTemplate.find('.glyphicon-heart').attr('data-id', vals[i][0]);
-                petTemplate.find('.panel-title').text(vals[i][1]);
-                petTemplate.find('img').attr('src', vals[i][2]);
-                petTemplate.find('.pet-age').text(vals[i][3]);
-                petTemplate.find('.pet-breed').text(vals[i][4]);
-                petTemplate.find('.pet-location').text(vals[i][5]);
-                // console.log(vals[i][6]);
-                if (vals[i][6] !== '0x0000000000000000000000000000000000000000')
+  var instance = await App.contracts.Adoption.deployed();
+  var num = await instance.petsCount.call();
+  // 1.obtain info about which ids are for auction and which ids are for adoption
+  var petTypes = [];
+  var petIdsForAdoption = [];
+  var petIdsForAuction = [];
+  for (i = 0; i < num; i++) {
+    petTypes.push(instance.getPetType(i));
+  }
+  petTypes = await Promise.all(petTypes);
+  for (i = 0; i < petTypes.length; i++) {
+    if (petTypes[i][1]) {
+      petIdsForAdoption.push(parseInt(petTypes[i][0]));
+    }
+    else {
+      petIdsForAuction.push(parseInt(petTypes[i][0]));
+    }
+  }
+  // console.log(petTypes);
+  // console.log(petIdsForAdoption);
+  // console.log(petIdsForAuction);
+
+  // 2.obtain the pet details and update the html (adoption)
+  var petBasicInfo = [];
+  var petLike = []; //for adoption only for now
+  for (i = 0; i < petIdsForAdoption.length; i++) {
+    petBasicInfo.push(instance.getPetInfo(petIdsForAdoption[i]));
+    petLike.push(instance.getLike(i));
+  }
+
+  petBasicInfo = await Promise.all(petBasicInfo);
+  petLike = await Promise.all(petLike);
+  for(i = 0;i <petBasicInfo.length;i++) {
+    AdoptionTemp.find('.btn-adopt').attr('data-id', petBasicInfo[i][0]);
+    AdoptionTemp.find('.btn-like').attr('data-id', petBasicInfo[i][0]);
+    AdoptionTemp.find('.glyphicon-heart').attr('data-id', petBasicInfo[i][0]);
+    AdoptionTemp.find('.panel-title').text(petBasicInfo[i][1]);
+    AdoptionTemp.find('img').attr('src', petBasicInfo[i][2]);
+    AdoptionTemp.find('.pet-age').text(petBasicInfo[i][3]);
+    AdoptionTemp.find('.pet-breed').text(petBasicInfo[i][4]);
+    AdoptionTemp.find('.pet-location').text(petBasicInfo[i][5]);
+
+    //update the buffer
+    if (petBasicInfo[i][6] !== '0x0000000000000000000000000000000000000000')
+      petTemplate.find('#0').text('Adopted').attr('disabled', true);
+    else
+      petTemplate.find('#0').text('Adopt').attr('disabled', false);
+
+    if (petLike[i]) {
+      petTemplate.find('#like').css('color', "#E3170D");
+      petTemplate.find('#1').attr('disabled', true);
+    }
+    else{
+      petTemplate.find('#like').css('color', "grey");
+      petTemplate.find('#1').attr('disabled', false);
+    }
+    AdoptionRow.append(AdoptionTemp.html());
+  }
+  // mark adopted pets
+    if (vals[i][6] !== '0x0000000000000000000000000000000000000000')
                     petTemplate.find('#0').text('Adopted').attr('disabled', true);
                 else
                     petTemplate.find('#0').text('Adopt').attr('disabled', false);
@@ -104,176 +135,244 @@ App = {
                     petTemplate.find('#1').attr('disabled', false);
                 }
 
-                petsRow.append(petTemplate.html());
-            }
-        }
-        //return App.markLiked();
-    },
 
-    markLiked: async function () {
+  // 3.obtain the pet details and update the html (auction)
+  petBasicInfo = [];
+  var petPriceInfo = [];
+  for (i = 0; i < petIdsForAuction.length; i++) {
+    petBasicInfo.push(instance.getPetInfo(petIdsForAuction[i]));
+    petPriceInfo.push(instance.getPetPrice(petIdsForAuction[i]));
+  }
 
-        var instance = await App.contracts.Adoption.deployed();
+  petBasicInfo = await Promise.all(petBasicInfo);
+  petPriceInfo = await Promise.all(petPriceInfo);
 
-        var num = await instance.petsCount.call();
-        //console.log(num);
-        var array = [];
-        for (var i = 0; i < num; i++) {
+  for(i = 0;i <petBasicInfo.length;i++) {
+    AuctionTemp.find('.btn-bid').attr('data-id', petBasicInfo[i][0]);
+    AuctionTemp.find('.input-amount').attr('id', petBasicInfo[i][0]);
+    AuctionTemp.find('.panel-title').text(petBasicInfo[i][1]);
+    AuctionTemp.find('img').attr('src', petBasicInfo[i][2]);
+    AuctionTemp.find('.pet-age').text(petBasicInfo[i][3]);
+    AuctionTemp.find('.pet-breed').text(petBasicInfo[i][4]);
+    AuctionTemp.find('.pet-location').text(petBasicInfo[i][5]);
 
-            array.push(instance.getLike(i));
+    AuctionTemp.find('.pet-current-price').text(petPriceInfo[i][1]);
+    AuctionTemp.find('.pet-min-increment').text(petPriceInfo[i][2]);
+    AuctionTemp.find('.pet-adopter').text(petPriceInfo[i][3]);
 
-        }
+    AuctionRow.append(AuctionTemp.html());
+  }
+  return App.markAdopted();
+ },
 
-        vals = await Promise.all(array);
+  LoadPetInfo: async function (event) {
+    event.preventDefault();
+    return App.LoadInfo();
+  },
 
-        for (i = 0; i < num; i++) {
-            if (vals[i]) {
-                $('.panel-pet').eq(i).find('#like').css('color', "red").attr('disabled', true);
-            }
-        }
+markAdopted: async function () {
+  // this part is moved to LoadPetInfo!
 
-    },
+  // var instance = await App.contracts.Adoption.deployed();
+  // var num = await instance.petsCount.call();
+  // var array = [];
+  // for (i = 0; i < num; i++) {
+  //   array.push(instance.getPetInfo(i));
+  // }
+  // vals = await Promise.all(array);
+  // for (i = 0; i < num; i++) {
+  //   if (vals[i][6] !== '0x0000000000000000000000000000000000000000') {
+  //             $('.panel-pet').eq(i).find('button').text('Success').attr('disabled', true);
+  //           }
+  // }
+},
 
-    LoadPetInfo: async function (event) {
-        event.preventDefault();
-        return App.LoadInfo();
-    },
+handleAdopt: function (event) {
+  event.preventDefault();
 
-    handleAdopt: function (event) {
-        event.preventDefault();
+  var petId = parseInt($(event.target).data('id'));
 
-        var petId = parseInt($(event.target).data('id'));
-        alert(petId);
-        var adoptionInstance;
+  var adoptionInstance;
 
-        web3.eth.getAccounts(function (error, accounts) {
-            if (error) {
-                console.log(error);
-            }
-
-            var account = accounts[0];
-
-            App.contracts.Adoption.deployed().then(function (instance) {
-                adoptionInstance = instance;
-
-                // Execute adopt as a transaction by sending account
-                return adoptionInstance.setAdopter(petId, {from: account});
-            }).then(function (result) {
-                return App.LoadInfo();
-            }).catch(function (err) {
-                console.log(err.message);
-            });
-        });
-    },
-
-    handleDonate: function () {
-        var x;
-        var amount = prompt("Please enter the amount you want to donate in ether", 0.0001);
-        if (amount != null) {
-            x = "You will donate " + amount + "ether to petShop owner. Comfirmed?";
-            if (confirm(x)) {
-                var account;
-                web3.eth.getAccounts(function (error, accounts) {
-                    if (error) {
-                        console.log(error);
-                    }
-                    var account = accounts[0];
-                    web3.eth.sendTransaction({
-                        from: account,
-                        to: App.contracts.Adoption.address,
-                        value: web3.toWei(amount, "ether"),
-                        gasPrice: web3.toWei(5, 'gwei')
-                    }, function (err, transactionHash) {
-                        if (!err) //if TX submitted, the following function increments the donation counter artificially to give the user instant feedback – despite the fact that the TX may still fail.
-                            //Please consider carefully whether or not to implement this feature.
-                            alert("Thanks for your donation. TX hash: " + transactionHash.substring(0, 8) + "...");
-                        else
-                            alert("donation failed. ");
-                    });
-                });
-            } else
-                alert("donate cancelled!");
-        }
-    },
-
-    handleAddPet: function (event) {
-        event.preventDefault();
-        web3.eth.defaultAccount = web3.eth.accounts[0];
-        const data = new FormData(event.target);
-        var url = "";
-        const reader = new FileReader();
-        reader.onloadend = function () {
-            const ipfs = window.IpfsApi('localhost', 5001) // Connect to IPFS
-            const buf = buffer.Buffer(reader.result) // Convert data into buffer
-            ipfs.files.add(buf, (err, result) => { // Upload buffer to IPFS
-                if (err) {
-                    console.error(err)
-                    return
-                }
-                url = `https://ipfs.io/ipfs/${result[0].hash}`;
-                var object = {};
-                data.forEach(function (value, key) {
-                    object[key] = value;
-                });
-                console.log(`Url --> ${url}`)
-                console.log(url)
-                object["picture"] = url;
-                var json = JSON.stringify(object);
-                alert(json);
-                App.contracts.Adoption.deployed().then(function (instance) {
-                    adoptionInstance = instance;
-                    // alert(object["name"]);
-                    // Execute adopt as a transaction by sending account
-                    return adoptionInstance.addNewPet(object["name"], object["picture"], parseInt(object["age"]), object["breed"], object["location"]);
-                }).then(function (res) {
-                    alert("Add New Pet Successfully! Now pets count is " + res.logs[0].args._count.toNumber());
-                }).then(function (res) {
-                    window.location.replace("index.html");
-                });
-
-            })
-        }
-        const photo = document.getElementById("id_picture");
-        reader.readAsArrayBuffer(photo.files[0]); // Read Provided File
-
-    },
-
-    handleLike: function (event) {
-        event.preventDefault();
-        var petId = parseInt($(event.target).data('id'));
-        alert(petId);
-        var likeInstance;
-
-        web3.eth.getAccounts(function (error, accounts) {
-            if (error) {
-                console.log(error);
-            }
-
-            var account = accounts[0];
-
-            App.contracts.Adoption.deployed().then(function (instance) {
-                likeInstance = instance;
-                return likeInstance.setLike(petId , {from: account});
-
-            }).then(function (result) {
-                return App.LoadInfo();
-
-            }).catch(function (err) {
-                console.log(err.message);
-            })
-
-        })
-
-    },
-
-
-    searchPets: function () {
-
+  web3.eth.getAccounts(function (error, accounts) {
+    if (error) {
+      console.log(error);
     }
+
+    var account = accounts[0];
+
+    App.contracts.Adoption.deployed().then(function (instance) {
+      adoptionInstance = instance;
+
+      // Execute adopt as a transaction by sending account
+      return adoptionInstance.setAdopter(petId, { from: account });
+    }).then(function (result) {
+      return App.markAdopted();
+    }).catch(function (err) {
+        console.log(err.message);
+      });
+  });
+},
+
+handleBid: function (event) {
+  event.preventDefault();
+
+  var petId = parseInt($(event.target).data('id'));
+  var bid_price = document.getElementById(petId).value;
+  bid_price = parseInt(bid_price);
+
+  console.log(petId, bid_price);
+  var biddingInstance;
+
+  web3.eth.getAccounts(function (error, accounts) {
+    if (error) {
+      console.log(error);
+    }
+
+    var account = accounts[0];
+
+    App.contracts.Adoption.deployed().then(function (instance) {
+      biddingInstance = instance;
+
+      return biddingInstance.processBid(petId, bid_price, {from: account});
+    }).then(function (result) {
+      if (result.logs[0].args._isSuccess) {
+        alert("Congrats, your bid has been successfully placed!");
+      }
+      else {
+        alert("Sorry, your bid is unsuccessful!"); //might be able to add the reason...
+      }
+      window.location.reload();
+      return App.markAdopted();
+    }).catch(function (err) {
+      console.log(err.message);
+    })
+  });
+},
+
+handleDonate: function () {
+  var x;
+  var amount = prompt("Please enter the amount you want to donate in ether", 0.0001);
+  if (amount != null) {
+    x = "You will donate " + amount + "ether to petShop owner. Comfirmed?";
+    if (confirm(x)) {
+      var account;
+      web3.eth.getAccounts(function (error, accounts) {
+        if (error) {
+          console.log(error);
+        }
+        var account = accounts[0];
+        web3.eth.sendTransaction({ from: account, to: App.contracts.Adoption.address, value: web3.toWei(amount, "ether"), gasPrice: web3.toWei(5, 'gwei') }, function (err, transactionHash) {
+          if (!err) //if TX submitted, the following function increments the donation counter artificially to give the user instant feedback – despite the fact that the TX may still fail.
+            //Please consider carefully whether or not to implement this feature.
+            alert("Thanks for your donation. TX hash: " + transactionHash.substring(0, 8) + "...");
+          else
+            alert("donation failed. ");
+        });
+      });
+  }
+  else
+    alert("donate cancelled!");
+  }
+},
+
+handleAddPet: function (event) {
+  event.preventDefault();
+  web3.eth.defaultAccount = web3.eth.accounts[0]
+  const data = new FormData(event.target);
+  var url = "";
+  const reader = new FileReader();
+  reader.onloadend = function () {
+    const ipfs = window.IpfsApi('localhost', 5001) // Connect to IPFS
+    const buf = buffer.Buffer(reader.result) // Convert data into buffer
+    ipfs.files.add(buf, (err, result) => { // Upload buffer to IPFS
+      if (err) {
+        console.error(err)
+        return
+      }
+      url = `https://ipfs.io/ipfs/${result[0].hash}`;
+      var object = {};
+      data.forEach(function (value, key) {
+        object[key] = value;
+      });
+      console.log(`Url --> ${url}`)
+      console.log(url)
+      object["picture"] = url;
+      var json = JSON.stringify(object);
+      alert(json);
+      App.contracts.Adoption.deployed().then(function (instance) {
+        adoptionInstance = instance;
+        // alert(object["name"]);
+        // Execute adopt as a transaction by sending account
+        console.log(Boolean(object["choice_of_type"]=="adoption"))
+        return adoptionInstance.addNewPet(object["name"], object["picture"], parseInt(object["age"]), object["breed"], object["location"], Boolean(object["choice_of_type"]=="adoption"), parseInt(object["minBid"]), parseInt(object["minIncrement"]));
+      }).then(function (res) {
+        alert("Add New Pet Successfully! Now pets count is " + res.logs[0].args._count.toNumber());
+      }).then(function(res) {
+        window.location.replace("index.html");
+      });
+
+    })
+  }
+  const photo = document.getElementById("id_picture");
+  reader.readAsArrayBuffer(photo.files[0]); // Read Provided File
+},
+
+handleLike: function (event) {
+  event.preventDefault();
+  var petId = parseInt($(event.target).data('id'));
+  alert(petId);
+  var likeInstance;
+
+  web3.eth.getAccounts(function (error, accounts) {
+    if (error) {
+      console.log(error);
+    }
+
+    var account = accounts[0];
+
+    App.contracts.Adoption.deployed().then(function (instance) {
+      likeInstance = instance;
+      return likeInstance.setLike(petId, { from: account });
+
+    }).then(function (result) {
+      return App.LoadInfo();
+
+    }).catch(function (err) {
+      console.log(err.message);
+    })
+
+  })
+
+}
 
 };
 
+// markLiked: async function () {
+
+//   var instance = await App.contracts.Adoption.deployed();
+
+//   var num = await instance.petsCount.call();
+//   //console.log(num);
+//   var array = [];
+//   for (var i = 0; i < num; i++) {
+
+//     array.push(instance.getLike(i));
+
+//   }
+
+//   vals = await Promise.all(array);
+
+//   for (i = 0; i < num; i++) {
+//     if (vals[i]) {
+//       $('.panel-pet').eq(i).find('#like').css('color', "red").attr('disabled', true);
+//     }
+//   }
+
+// },
+
 $(function () {
-    $(window).load(function () {
-        App.init();
-    });
+  $(window).load(function () {
+    App.init();
+  });
 });
