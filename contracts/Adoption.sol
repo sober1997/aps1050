@@ -15,6 +15,7 @@ contract Adoption {
     mapping(uint256 => mapping(uint256 => Pet)) public Pets;
     uint256 public petsCount;
     uint256 private _testIterationNum = 0;
+    mapping(uint256 => address[]) public likes;
 
     constructor() public {
         petsCount = 0;
@@ -94,4 +95,22 @@ contract Adoption {
     // }
 
     function() external payable {}
+
+    function setLike(uint256 petId) public returns(uint256){
+        require(petId >= 0 && petId < petsCount);
+        likes[petId].push(msg.sender);
+        return petId;
+    }
+
+    function getLike(uint256 petId) public view returns(bool){
+        require(petId >= 0 && petId < petsCount);
+        uint len = likes[petId].length;
+        for (uint i = 0; i < len; i++){
+            if (likes[petId][i] == msg.sender){
+                return true;
+            }
+        }
+        return false;
+
+    }
 }

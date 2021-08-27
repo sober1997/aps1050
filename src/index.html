@@ -21,12 +21,12 @@
     <script src="js/fileinput.min.js"></script>
     <link href="css/fileinput.min.css" rel="stylesheet">
     <link href="http://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <!-- <link rel="stylesheet" href="style.css"> -->
     <link href="css/custom.css" rel="stylesheet">
     <script src="js/web3.min.js"></script>
     <script src="js/truffle-contract.js"></script>
     <script src="js/app.js"></script>
-    
+
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -44,7 +44,8 @@
           <ul class="nav navbar-nav navbar-right">
               <li><a href="/">Homepage</a><li></li>
               <li><a href="/add_a_new_pet.html">add a new pet</a><li>
-              <li><button class="btn btn-donate" type="button" onclick="App.handleDonate()">Donate</button></li>
+              <li><button class="btn btn-link btn-donate" type="button" onclick="App.handleDonate()" style="margin-top:9px">Donate</button></li>
+
           </ul>
           </div>
       </div>
@@ -88,7 +89,10 @@
             <strong>Breed</strong>: <span class="pet-breed">Golden Retriever</span><br/>
             <strong>Age</strong>: <span class="pet-age">3</span><br/>
             <strong>Location</strong>: <span class="pet-location">Warren, MI</span><br/><br/>
-            <button class="btn btn-default btn-adopt" type="button" data-id="0">Adopt</button>
+            <button class="btn btn-default btn-adopt" type="button" id="0">Adopt</button>
+            <button class="btn btn-link btn-like" id="1" type="button">
+              <span class="glyphicon glyphicon-heart" id="like" style="color: grey;"></span>
+            </button>
           </div>
         </div>
       </div>
