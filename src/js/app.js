@@ -166,6 +166,9 @@ App = {
         attribute == "location" && petBasicInfo[i][5] == attributeValue){
     AuctionTemp.find('.btn-bid').attr('data-id', petBasicInfo[i][0]);
     AuctionTemp.find('.input-amount').attr('id', petBasicInfo[i][0]);
+
+    AuctionTemp.find('.input-amount').attr('size', 3);
+
     AuctionTemp.find('.panel-title').text(petBasicInfo[i][1]);
     AuctionTemp.find('img').attr('src', petBasicInfo[i][2]);
     AuctionTemp.find('.pet-age').text(petBasicInfo[i][3]);
