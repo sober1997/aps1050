@@ -102,7 +102,7 @@ App = {
   var petLike = []; //for adoption only for now
   for (i = 0; i < petIdsForAdoption.length; i++) {
     petBasicInfo.push(instance.getPetInfo(petIdsForAdoption[i]));
-    petLike.push(instance.getLike(i));
+    petLike.push(instance.getLike(petIdsForAdoption[i]));
   }
 
   petBasicInfo = await Promise.all(petBasicInfo);
@@ -116,6 +116,7 @@ App = {
   
   // console.log(attribute);
   // console.log(attributeValue);
+  // console.log(petLike);
 
   for(i = 0;i <petBasicInfo.length;i++) {
     if (attributeValue == "" || attribute == "breed" && petBasicInfo[i][4] == attributeValue ||
@@ -143,7 +144,7 @@ App = {
       else{
         AdoptionTemp.find('#like').css('color', "grey");
         AdoptionTemp.find('#1').attr('disabled', false);
-    }
+      }
     AdoptionRow.append(AdoptionTemp.html());
   }
   }
@@ -152,35 +153,51 @@ App = {
   // 3.obtain the pet details and update the html (auction)
   petBasicInfo = [];
   var petPriceInfo = [];
+
+  petLike = []; //empty the petLike array first
   for (i = 0; i < petIdsForAuction.length; i++) {
     petBasicInfo.push(instance.getPetInfo(petIdsForAuction[i]));
     petPriceInfo.push(instance.getPetPrice(petIdsForAuction[i]));
+    petLike.push(instance.getLike(petIdsForAuction[i]));
   }
 
   petBasicInfo = await Promise.all(petBasicInfo);
   petPriceInfo = await Promise.all(petPriceInfo);
+  petLike = await Promise.all(petLike);
+
+  // console.log(petLike);
 
   for(i = 0;i <petBasicInfo.length;i++) {
     if (attributeValue == "" || attribute == "breed" && petBasicInfo[i][4] == attributeValue ||
-        attribute == "age" && petBasicInfo[i][3] == attributeValue ||
-        attribute == "location" && petBasicInfo[i][5] == attributeValue){
-    AuctionTemp.find('.btn-bid').attr('data-id', petBasicInfo[i][0]);
-    AuctionTemp.find('.input-amount').attr('id', petBasicInfo[i][0]);
+    attribute == "age" && petBasicInfo[i][3] == attributeValue ||
+    attribute == "location" && petBasicInfo[i][5] == attributeValue){
+      AuctionTemp.find('.btn-bid').attr('data-id', petBasicInfo[i][0]);
+      AuctionTemp.find('.input-amount').attr('id', petBasicInfo[i][0]);
+      AuctionTemp.find('.btn-like').attr('data-id', petBasicInfo[i][0]);
+      AuctionTemp.find('.glyphicon-heart').attr('data-id', petBasicInfo[i][0]);
 
-    AuctionTemp.find('.input-amount').attr('size', 3);
+      AuctionTemp.find('.input-amount').attr('size', 3);
 
-    AuctionTemp.find('.panel-title').text(petBasicInfo[i][1]);
-    AuctionTemp.find('img').attr('src', petBasicInfo[i][2]);
-    AuctionTemp.find('.pet-age').text(petBasicInfo[i][3]);
-    AuctionTemp.find('.pet-breed').text(petBasicInfo[i][4]);
-    AuctionTemp.find('.pet-location').text(petBasicInfo[i][5]);
+      AuctionTemp.find('.panel-title').text(petBasicInfo[i][1]);
+      AuctionTemp.find('img').attr('src', petBasicInfo[i][2]);
+      AuctionTemp.find('.pet-age').text(petBasicInfo[i][3]);
+      AuctionTemp.find('.pet-breed').text(petBasicInfo[i][4]);
+      AuctionTemp.find('.pet-location').text(petBasicInfo[i][5]);
 
-    AuctionTemp.find('.pet-current-price').text(petPriceInfo[i][1]);
-    AuctionTemp.find('.pet-min-increment').text(petPriceInfo[i][2]);
-    if (petPriceInfo[i][3] == '0x0000000000000000000000000000000000000000'){
-      petPriceInfo[i][3] = 'None';
-    }
-    AuctionTemp.find('.pet-adopter').text(petPriceInfo[i][3]);
+      AuctionTemp.find('.pet-current-price').text(petPriceInfo[i][1]);
+      AuctionTemp.find('.pet-min-increment').text(petPriceInfo[i][2]);
+      if (petPriceInfo[i][3] == '0x0000000000000000000000000000000000000000'){
+        petPriceInfo[i][3] = 'None';
+      }
+      if (petLike[i]) {
+        AuctionTemp.find('#like').css('color', "#E3170D");
+        AuctionTemp.find('#1').attr('disabled', true);
+      }
+      else{
+        AuctionTemp.find('#like').css('color', "grey");
+        AuctionTemp.find('#1').attr('disabled', false);
+      }
+      AuctionTemp.find('.pet-adopter').text(petPriceInfo[i][3]);
 
     AuctionRow.append(AuctionTemp.html());
   }
