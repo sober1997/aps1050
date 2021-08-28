@@ -80,6 +80,19 @@ App = {
       petIdsForAuction.push(parseInt(petTypes[i][0]));
     }
   }
+  // update the prepeared texts for empty contents
+  if (petIdsForAdoption.length == 0){
+    document.getElementById('no-adoption-text').hidden=false;
+  }
+  else {
+    document.getElementById('no-adoption-text').hidden=true;
+  }
+  if (petIdsForAuction.length == 0){
+    document.getElementById('no-auction-text').hidden=false;
+  }
+  else {
+    document.getElementById('no-auction-text').hidden=true;
+  }
   // console.log(petTypes);
   // console.log(petIdsForAdoption);
   // console.log(petIdsForAuction);
