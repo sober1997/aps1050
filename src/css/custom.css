@@ -107,3 +107,9 @@ input {
     font-family: FontAwesome;
     color: #324b4e;
 }
+/* add below to adjust the ratio buttons*/
+input[type=radio] {
+    border: 0px;
+    width: 30%;
+    height: 1em;
+}

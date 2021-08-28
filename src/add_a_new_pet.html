@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <title>Add New Pet</title>
+
     <!-- Bootstrap -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
 
@@ -56,7 +57,7 @@
             <ul class="nav navbar-nav navbar-right">
                 <li><a href="/">Homepage</a><li></li>
                 <li><a href="/add_a_new_pet.html">add a new pet</a><li>
-                <li><button class="btn btn-donate" type="button" onclick="App.handleDonate()">Donate</button></li>
+                <li><button class="btn btn-link btn-donate" type="button" onclick="App.handleDonate()" style="margin-top:9px">Donate</button></li>
             </ul>
             </div>
         </div>
@@ -93,18 +94,17 @@
             <input type="text" class="form-control" name="location" id="id_location" placeholder="Enter its location" required>
         </div>
         <div class="form-group">
-            <input type="radio" class="form-control" id="id_adoption" name="choice_of_type" value="adoption">
-            <label for="adoption">Adoption</label><br>
-            <input type="radio" class="form-control" id="id_auction" name="choice_of_type" value="auction">
-            <label for="auction">Auction</label>
+            <p style="color:red;">Please select your entry type:</p>
+            <input type="radio" id="id_adoption" name="choice_of_type" value="adoption">
+            <label for="adoption" >Adoption</label><br>
+            <input type="radio" id="id_auction" name="choice_of_type" value="auction">
+            <label for="auction" >Auction</label>
         </div>
-        <div class="form-group">
+        <div class="form-group" id="hidden-inputs" hidden="true">
             <label for="id_minBid">Minimum Bid</label>
-            <input type="text" class="form-control" name="minBid" id="id_minBid" placeholder="5" required>
-        </div>
-        <div class="form-group">
+            <input type="text" class="form-control" name="minBid" id="id_minBid" placeholder="5" value= "0" required>
             <label for="id_minIncrement">Minimum Increment</label>
-            <input type="text" class="form-control" name="minIncrement" id="id_minIncrement" placeholder="1" required>
+            <input type="text" class="form-control" name="minIncrement" id="id_minIncrement" placeholder="1" value="0" required>
         </div>
         <div class="form-group">
             <a class="btn btn-default pull-left" href="/">Back</a>

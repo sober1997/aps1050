@@ -299,6 +299,14 @@ handleAddPet: function (event) {
       data.forEach(function (value, key) {
         object[key] = value;
       });
+      // add startPrice and minIncrement placeholders for adoption
+      console.log(object["minBid"]);
+      console.log(object["minIncrement"]);
+      if (object["minBid"] == null || object["minIncrement"] == null){
+        console.log("add place holder for adoptions");
+        object["minBid"] = 0;
+        object["minIncrement"] = 0;
+      }
       console.log(`Url --> ${url}`)
       console.log(url)
       object["picture"] = url;
@@ -378,5 +386,16 @@ handleLike: function (event) {
 $(function () {
   $(window).load(function () {
     App.init();
+  });
+});
+
+$(function() {
+  $('input[name="choice_of_type"]').on('click', function() {
+      if ($(this).val() == 'auction') {
+          $('#hidden-inputs').show();
+      }
+      else {
+          $('#hidden-inputs').hide();
+      }
   });
 });
