@@ -282,8 +282,8 @@ handleBid: function (event) {
       else {
         alert("Sorry, your bid is unsuccessful!"); //might be able to add the reason...
       }
-      window.location.reload();
-      return App.markAdopted();
+      //window.location.reload();
+      return App.LoadInfo();
     }).catch(function (err) {
       console.log(err.message);
     })
