@@ -177,6 +177,9 @@ App = {
 
     AuctionTemp.find('.pet-current-price').text(petPriceInfo[i][1]);
     AuctionTemp.find('.pet-min-increment').text(petPriceInfo[i][2]);
+    if (petPriceInfo[i][3] == '0x0000000000000000000000000000000000000000'){
+      petPriceInfo[i][3] = 'None';
+    }
     AuctionTemp.find('.pet-adopter').text(petPriceInfo[i][3]);
 
     AuctionRow.append(AuctionTemp.html());
