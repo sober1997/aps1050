@@ -311,7 +311,7 @@ handleAddPet: function (event) {
       console.log(url)
       object["picture"] = url;
       var json = JSON.stringify(object);
-      alert(json);
+      //alert(json);
       App.contracts.Adoption.deployed().then(function (instance) {
         adoptionInstance = instance;
         // alert(object["name"]);
@@ -333,7 +333,7 @@ handleAddPet: function (event) {
 handleLike: function (event) {
   event.preventDefault();
   var petId = parseInt($(event.target).data('id'));
-  alert(petId);
+  // alert(petId);
   var likeInstance;
 
   web3.eth.getAccounts(function (error, accounts) {
